@@ -1,0 +1,33 @@
+name: Chillest + PDP Generation
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 5 * * 1'  # At 05:00 on Mondays (UTC)
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+    env:
+      SPOTIPY_CLIENT_ID: ${{ secrets.SPOTIPY_CLIENT_ID }}
+      SPOTIPY_CLIENT_SECRET: ${{ secrets.SPOTIPY_CLIENT_SECRET }}
+      SPOTIPY_REDIRECT_URI: ${{ secrets.SPOTIPY_REDIRECT_URI }}
+      SPOTIPY_USERNAME: ${{ secrets.SPOTIPY_USERNAME }}
+      POWERDOWN_PLAYLIST_ID: ${{ secrets.POWERDOWN_PLAYLIST_ID }}
+      CHILLEST_PLAYLIST_ID: ${{ secrets.CHILLEST_PLAYLIST_ID }}
+      SPOTIPY_REFRESH_TOKEN: ${{ secrets.SPOTIPY_REFRESH_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          pip install selenium spotipy beautifulsoup4
+      - name: Run Power Down
+        run: python powerdown.py
+      - name: Run Chillest
+        run: python chillest.py
+
