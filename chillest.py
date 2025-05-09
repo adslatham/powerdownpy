@@ -134,6 +134,9 @@ token_info = sp_oauth.refresh_access_token(SPOTIPY_REFRESH_TOKEN)
 access_token = token_info['access_token']
 print("Access token refreshed")
 
+# Set up Spotipy with the access token
+sp = spotipy.Spotify(auth=access_token)
+
 track_ids = [search_song(sp, artist, title) for artist, title in songs]
 track_ids = [tid for tid in track_ids if tid]
 
