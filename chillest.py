@@ -86,17 +86,19 @@ def add_songs_to_existing_playlist(sp, playlist_id, track_ids):
 soup = BeautifulSoup(html, "html.parser")
 
 # Find all divs with the specified data-testid
-divs = soup.find_all("div", attrs={"data-testid": "playableListCard"})
+#divs = soup.find_all("div", attrs={"data-testid": "playableListCard"})
+divs = soup.find_all("a", attrs={"data-bbc-container": "list-tleo"})
 
 print("cards:" + str(len(divs)))
 
 # Extract the first <a> href inside each div
 links = []
 for div in divs:
-    a_tag = div.find("a", href=True)
-    print(a_tag)
-    if a_tag:
-        links.append(a_tag["href"])
+    links.append(div["href"])
+    
+    #a_tag = div.find("a", href=True)
+    #if a_tag:
+        #links.append(a_tag["href"])
 
 songs = []
 l = 0
