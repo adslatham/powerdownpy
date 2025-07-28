@@ -88,7 +88,7 @@ soup = BeautifulSoup(html, "html.parser")
 # Find all divs with the specified data-testid
 divs = soup.find_all("div", attrs={"data-testid": "playableListCard"})
 
-print("cards:" + len(divs))
+print("cards:" + str(len(divs)))
 
 # Extract the first <a> href inside each div
 links = []
