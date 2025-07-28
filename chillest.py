@@ -30,7 +30,7 @@ SPOTIPY_REFRESH_TOKEN = os.getenv("SPOTIPY_REFRESH_TOKEN")
 PLAYLIST_ID = os.getenv("CHILLEST_PLAYLIST_ID")
 USERNAME = os.getenv("SPOTIPY_USERNAME")
 
-driver.get("https://www.bbc.co.uk/sounds/brand/b03hjfww")
+driver.get("https://www.bbc.co.uk/programmes/b03hjfww")
 
 print ("Waiting for 2 seconds")
 
