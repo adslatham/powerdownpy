@@ -92,6 +92,7 @@ divs = soup.find_all("div", attrs={"data-testid": "playableListCard"})
 links = []
 for div in divs:
     a_tag = div.find("a", href=True)
+    print(a_tag)
     if a_tag:
         links.append(a_tag["href"])
 
