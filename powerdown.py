@@ -70,13 +70,16 @@ def add_songs_to_playlist(sp, playlist_id, track_ids):
     print(f"✅ {len(track_ids)} tracks added to playlist.")
 
 soup = BeautifulSoup(driver.page_source, "html.parser")
-divs = soup.find_all("div", attrs={"data-testid": "playableListCard"})
+#divs = soup.find_all("div", attrs={"data-testid": "playableListCard"})
+
+divs = soup.find_all("a", attrs={"data-bbc-container": "list-tleo"})
 
 links = []
 for div in divs:
-    a_tag = div.find("a", href=True)
-    if a_tag:
-        links.append(a_tag["href"])
+    links.append(div["href"])
+    #a_tag = div.find("a", href=True)
+    #if a_tag:
+    #    links.append(a_tag["href"])
 
 songs = []
 
