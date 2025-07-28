@@ -32,9 +32,9 @@ USERNAME = os.getenv("SPOTIPY_USERNAME")
 
 driver.get("https://www.bbc.co.uk/sounds/brand/b03hjfww")
 
-print ("Waiting for 2 seconds")
+print ("Waiting for 4 seconds")
 
-time.sleep(2)
+time.sleep(4)
 
 print ("Done waiting")
 
@@ -84,8 +84,6 @@ def add_songs_to_existing_playlist(sp, playlist_id, track_ids):
         print("No new songs to add.")  
 
 soup = BeautifulSoup(html, "html.parser")
-
-print(html)
 
 # Find all divs with the specified data-testid
 #divs = soup.find_all("div", attrs={"data-testid": "playableListCard"})
