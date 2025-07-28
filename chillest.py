@@ -85,6 +85,8 @@ def add_songs_to_existing_playlist(sp, playlist_id, track_ids):
 
 soup = BeautifulSoup(html, "html.parser")
 
+print(html)
+
 # Find all divs with the specified data-testid
 #divs = soup.find_all("div", attrs={"data-testid": "playableListCard"})
 divs = soup.find_all("a", attrs={"data-bbc-container": "list-tleo"})
