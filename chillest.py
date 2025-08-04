@@ -44,6 +44,9 @@ try:
 except:
     print("Timed out waiting for playable list cards to load")
 
+with open("page_dump.html", "w", encoding="utf-8") as f:
+    f.write(driver.page_source)
+
 print ("Done waiting")
 
 html = driver.page_source
@@ -166,4 +169,5 @@ clear_playlist(PLAYLIST_ID)
 add_songs_to_playlist(sp, PLAYLIST_ID, track_ids)
 
 print ("Chillest Show Playlist generation complete")
+
 
