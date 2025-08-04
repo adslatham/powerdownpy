@@ -16,10 +16,11 @@ print("Starting script execution")
 
 # Set up Chrome options for headless run
 options = Options()
-options.add_argument("--headless")
-options.add_argument("--no-sandbox")
-options.add_argument("--disable-dev-shm-usage")
+options.add_argument("--headless=new")
 options.add_argument("--disable-gpu")
+options.add_argument("--no-sandbox")
+options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36")
+
 
 # Create the webdriver
 driver = webdriver.Chrome(options=options)
@@ -165,3 +166,4 @@ clear_playlist(PLAYLIST_ID)
 add_songs_to_playlist(sp, PLAYLIST_ID, track_ids)
 
 print ("Chillest Show Playlist generation complete")
+
