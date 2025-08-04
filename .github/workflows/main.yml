@@ -30,8 +30,3 @@ jobs:
         run: python powerdown.py
       - name: Run Chillest
         run: python chillest.py
-      - name: Upload HTML dump
-        uses: actions/upload-artifact@v4
-        with:
-          name: html-dump
-          path: page_dump.html
