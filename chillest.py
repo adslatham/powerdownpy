@@ -3,6 +3,8 @@ print ("Starting imports")
 import re
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 import spotipy
@@ -32,9 +34,14 @@ USERNAME = os.getenv("SPOTIPY_USERNAME")
 
 driver.get("https://www.bbc.co.uk/sounds/brand/b03hjfww")
 
-print ("Waiting for 4 seconds")
+print ("Waiting for loading")
 
-time.sleep(4)
+try:
+    WebDriverWait(driver, 15).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, "[data-bbc-container='list-tleo']"))
+    )
+except:
+    print("Timed out waiting for playable list cards to load")
 
 print ("Done waiting")
 
@@ -106,7 +113,14 @@ for link in links:
     if l < 4:
         print(link)
         driver.get("https://www.bbc.co.uk" + link)
-        driver.implicitly_wait(2)
+        
+        try:
+            WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, ".sc-c-basic-tile"))
+            )
+        except:
+            print("Timed out waiting for tiles to appear on page:", link)
+        
         soundshtml = driver.page_source
         
         showsoup = BeautifulSoup(soundshtml, "html.parser")
