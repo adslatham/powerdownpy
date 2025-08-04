@@ -1,26 +1,15 @@
 print ("Starting imports")
 
 import re
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 import time
 import os
+import requests
+import json
 
 print("Starting script execution")
-
-# Set up Chrome options for headless run
-options = Options()
-options.add_argument("--headless")
-options.add_argument("--no-sandbox")
-options.add_argument("--disable-dev-shm-usage")
-options.add_argument("--disable-gpu")
-
-# Create the webdriver
-driver = webdriver.Chrome(options=options)
 
 # Load environment variables
 SPOTIPY_CLIENT_ID = os.getenv("SPOTIPY_CLIENT_ID")
@@ -30,13 +19,19 @@ SPOTIPY_REFRESH_TOKEN = os.getenv("SPOTIPY_REFRESH_TOKEN")
 PLAYLIST_ID = os.getenv("POWERDOWN_PLAYLIST_ID")
 USERNAME = os.getenv("SPOTIPY_USERNAME")
 
-driver.get("https://www.bbc.co.uk/sounds/brand/p04m6srg")
+url = "https://www.bbc.co.uk/sounds/brand/p04m6srg"
+headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
+}
+response = requests.get(url, headers=headers)
 
-print ("Waiting for 2 seconds")
+if response.status_code == 200:
+    print("Page retrieved successfully.")
+    #print(response.text)  # print first 1000 characters of the HTML
+else:
+    print(f"Failed to retrieve page. Status code: {response.status_code}")
 
-time.sleep(2)
-
-print ("Done waiting")
+html = response.text
 
 def clean_title(title):
     return re.sub(r"\(feat\..*?\)", "", title, flags=re.IGNORECASE).strip()
@@ -69,40 +64,70 @@ def add_songs_to_playlist(sp, playlist_id, track_ids):
         sp.playlist_add_items(playlist_id, track_ids[i:i+100])
     print(f"✅ {len(track_ids)} tracks added to playlist.")
 
-soup = BeautifulSoup(driver.page_source, "html.parser")
-#divs = soup.find_all("div", attrs={"data-testid": "playableListCard"})
+soup = BeautifulSoup(html, "html.parser")
 
 divs = soup.find_all("a", attrs={"data-bbc-container": "list-tleo"})
+
+print("cards:" + str(len(divs)))
 
 links = []
 for div in divs:
     links.append(div["href"])
-    #a_tag = div.find("a", href=True)
-    #if a_tag:
-    #    links.append(a_tag["href"])
 
 songs = []
 
 for link in links:
     print(link)
+        
+    url = "https://www.bbc.co.uk" + link
     
-    driver.get("https://www.bbc.co.uk" + link)
-    driver.implicitly_wait(2)
-    soundshtml = driver.page_source
-    
-    showsoup = BeautifulSoup(soundshtml, "html.parser")
-    i = 0
-    for tile in showsoup.select(".sc-c-basic-tile"):
-        artist = tile.select_one(".sc-c-basic-tile__artist")
-        title = tile.select_one(".sc-c-basic-tile__title")
-        if artist and title:
-            song_tuple = (artist.text.strip(), title.text.strip())
-            if song_tuple not in songs:
-                songs.append(song_tuple)
-                i+=1
-    print(str(i) + " new songs added to array")
+    response = requests.get(url, headers=headers)
 
-driver.quit()
+    if response.status_code == 200:
+        print("Page retrieved successfully.")
+        #print(response.text)
+    else:
+        print(f"Failed to retrieve page. Status code: {response.status_code}")
+                    
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text, "html.parser")
+        
+        tracklist = []
+
+        # Find all script tags
+        scripts = soup.find_all("script")
+
+        preloaded_state = None
+
+        # Search for the one containing '__PRELOADED_STATE__'
+        for script in scripts:
+            if script.string and "__PRELOADED_STATE__" in script.string:
+                match = re.search(r'window\.__PRELOADED_STATE__\s*=\s*({.*?})\s*;', script.string, re.DOTALL)
+                if match:
+                    json_str = match.group(1)
+                    try:
+                        preloaded_state = json.loads(json_str)
+                        print("Parsed __PRELOADED_STATE__ successfully.")
+                        tracklist = preloaded_state["tracklist"]["tracks"]
+                        
+                        i = 0
+                        for t in tracklist:
+                            artist = t["titles"]["primary"]
+                            title = t["titles"]["secondary"]
+                            if artist and title:
+                                song_tuple = (artist.strip(), title.strip())
+                                if song_tuple not in songs:
+                                    songs.append(song_tuple)
+                                    i+=1
+                        print(str(i) + " new songs added to array")
+                    except json.JSONDecodeError as e:
+                        print("Failed to decode JSON:", e)
+                break
+
+        if preloaded_state is None:
+            print("__PRELOADED_STATE__ not found.")
+    else:
+        print(f"Request failed. Status code: {response.status_code}")
 
 print(songs)
 
