@@ -77,8 +77,9 @@ for div in divs:
 songs = []
 
 for link in links:
+    link = link.replace("sounds/play", "programmes")
     print(link)
-        
+    
     url = "https://www.bbc.co.uk" + link
     
     response = requests.get(url, headers=headers)
@@ -150,4 +151,5 @@ clear_playlist(PLAYLIST_ID)
 add_songs_to_playlist(sp, PLAYLIST_ID, track_ids)
 
 print ("Power Down Playlist generation complete")
+
 
