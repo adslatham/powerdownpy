@@ -92,6 +92,8 @@ songs = []
 l = 0
 for link in links:
     if l < 4:
+
+        link = link.replace("sounds/play", "programmes")
         
         print(link)
         
@@ -167,4 +169,5 @@ clear_playlist(PLAYLIST_ID)
 add_songs_to_playlist(sp, PLAYLIST_ID, track_ids)
 
 print ("Chillest Show Playlist generation complete")
+
 
