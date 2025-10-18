@@ -110,38 +110,32 @@ for link in links:
             
             tracklist = []
 
-            # Find all script tags
-            scripts = soup.find_all("script")
+            ul = soup.find("ul", class_="segments-list__items")
 
             preloaded_state = None
 
-            # Search for the one containing '__PRELOADED_STATE__'
-            for script in scripts:
-                if script.string and "__PRELOADED_STATE__" in script.string:
-                    match = re.search(r'window\.__PRELOADED_STATE__\s*=\s*({.*?})\s*;', script.string, re.DOTALL)
-                    if match:
-                        json_str = match.group(1)
-                        try:
-                            preloaded_state = json.loads(json_str)
-                            print("Parsed __PRELOADED_STATE__ successfully.")
-                            tracklist = preloaded_state["tracklist"]["tracks"]
-                            
-                            i = 0
-                            for t in tracklist:
-                                artist = t["titles"]["primary"]
-                                title = t["titles"]["secondary"]
-                                if artist and title:
-                                    song_tuple = (artist.strip(), title.strip())
-                                    if song_tuple not in songs:
-                                        songs.append(song_tuple)
-                                        i+=1
-                            print(str(i) + " new songs added to array")
-                        except json.JSONDecodeError as e:
-                            print("Failed to decode JSON:", e)
-                    break
+            i = 0
+            if ul:
+                for li in ul.find_all("li"):
+                    h3_tag = li.find("h3")
+                    p_tag = li.find("p")
 
-            if preloaded_state is None:
-                print("__PRELOADED_STATE__ not found.")
+                    artist_span = h3_tag.find("span") if h3_tag else None
+                    title_span = p_tag.find("span") if p_tag else None
+
+                    if artist_span and title_span:
+                        artist = artist_span.get_text(strip=True)
+                        title = title_span.get_text(strip=True)
+
+                        song_tuple = (artist, title)
+
+                        if song_tuple not in songs:
+                            songs.append(song_tuple)
+                            i += 1
+            
+                print(str(i) + " new songs added to array")
+            else:
+                print("UL not found")
         else:
             print(f"Request failed. Status code: {response.status_code}")
     l+=1
@@ -173,3 +167,4 @@ clear_playlist(PLAYLIST_ID)
 add_songs_to_playlist(sp, PLAYLIST_ID, track_ids)
 
 print ("Chillest Show Playlist generation complete")
+
